@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electro Electric - Pro</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#f5f5f5}
+header{background:#000;color:#fff;padding:20px;text-align:center}
+.container{padding:15px}
+.product{background:#fff;margin:15px 0;padding:15px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,0.1)}
+.price{color:green;font-weight:bold}
+button{padding:10px;width:100%;border:none;border-radius:8px;margin-top:10px;cursor:pointer}
+.buy{background:#28a745;color:#fff}
+.wa{background:#25D366;color:#fff}
+.form-box{background:#fff;padding:15px;border-radius:12px;margin-top:20px}
+input,textarea{width:100%;padding:10px;margin:5px 0;border-radius:6px;border:1px solid #ccc}
+.footer{text-align:center;background:#000;color:#fff;padding:10px;margin-top:20px}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Electro Electric</h1>
+<p>North East Delhi | Repair Parts Store</p>
+</header>
+
+<div class="container">
+
+<div class="product">
+<h2>SMPS Repair Kit</h2>
+<p class="price">₹299</p>
+<button class="buy" onclick="selectProduct('SMPS Repair Kit',299)">Buy Now</button>
+</div>
+
+<div class="product">
+<h2>Induction Repair Kit</h2>
+<p class="price">₹399</p>
+<button class="buy" onclick="selectProduct('Induction Repair Kit',399)">Buy Now</button>
+</div>
+
+<div class="form-box">
+<h3>Order Form</h3>
+<input id="name" placeholder="Name">
+<input id="phone" placeholder="Mobile Number">
+<textarea id="address" placeholder="Address"></textarea>
+<input id="product" readonly placeholder="Product">
+<input id="price" readonly placeholder="Price">
+
+<button class="buy" onclick="payNow()">Pay via UPI</button>
+<button class="wa" onclick="sendWhatsApp()">Confirm on WhatsApp</button>
+</div>
+
+</div>
+
+<div class="footer">
+<p>Prepaid Orders Only</p>
+</div>
+
+<script>
+let product="", price="";
+
+function selectProduct(p, pr){
+ product=p;
+ price=pr;
+ document.getElementById('product').value=p;
+ document.getElementById('price').value="₹"+pr;
+}
+
+function payNow(){
+ let name=document.getElementById('name').value;
+ let phone=document.getElementById('phone').value;
+ let address=document.getElementById('address').value;
+
+ if(!name||!phone||!address||!product){
+ alert('Fill all details');
+ return;
+ }
+
+ let upi="9953311542@ybl";
+ let url=`upi://pay?pa=${upi}&pn=ElectroElectric&am=${price}&cu=INR`;
+ window.location.href=url;
+}
+
+function sendWhatsApp(){
+ let name=document.getElementById('name').value;
+ let phone=document.getElementById('phone').value;
+ let address=document.getElementById('address').value;
+
+ if(!name||!phone||!address||!product){
+ alert('Fill all details');
+ return;
+ }
+
+ let msg=`Order:%0AName:${name}%0APhone:${phone}%0AProduct:${product}%0APrice:₹${price}%0AAddress:${address}`;
+ let url=`https://wa.me/91XXXXXXXXXX?text=${msg}`;
+ window.open(url,'_blank');
+}
+</script>
+
+</body>
+</html>
