@@ -1,22 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Electro Electric - Pro Store</title>
+<title>Electro Electric</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f1f3f6}
+body{font-family:Arial;margin:0;background:#f1f3f6}
 header{background:#131921;color:#fff;padding:15px;text-align:center}
-.search-box{padding:10px;width:90%;margin:10px auto;display:block;border-radius:5px;border:none}
-.container{padding:10px}
-.product{background:#fff;margin:10px 0;padding:10px;border-radius:8px}
-.price{color:green;font-weight:bold}
-button{padding:8px;border:none;border-radius:5px;margin-top:5px;cursor:pointer}
-.add{background:#ff9900}
-.buy{background:#28a745;color:#fff}
-.cart{position:fixed;bottom:10px;right:10px;background:#000;color:#fff;padding:10px;border-radius:50%}
-.rating{color:orange}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px}
+.card,.product{background:#fff;padding:10px;border-radius:10px;text-align:center}
+button{padding:8px;margin-top:5px;border:none;border-radius:5px;background:#28a745;color:#fff}
+.cart{position:fixed;bottom:10px;right:10px;background:#000;color:#fff;padding:12px;border-radius:50%}
 </style>
 </head>
 
@@ -24,69 +18,131 @@ button{padding:8px;border:none;border-radius:5px;margin-top:5px;cursor:pointer}
 
 <header>
 <h2>Electro Electric</h2>
-<p>North East Delhi</p>
 </header>
 
-<input type="text" class="search-box" placeholder="Search product..." onkeyup="searchProduct(this.value)">
+<div id="home">
+<h3 style="padding:10px">Categories</h3>
 
-<div class="container" id="productList"></div>
+<div class="grid">
+<div class="card" onclick="openCat('transistor')">Transistors</div>
+<div class="card" onclick="openCat('mosfet')">MOSFET</div>
+<div class="card" onclick="openCat('capacitor')">Capacitors</div>
+<div class="card" onclick="openCat('pcb')">Induction PCB</div>
+</div>
+</div>
 
-<div class="cart" onclick="viewCart()">🛒</div>
+<div id="products" style="display:none">
+<h3 style="padding:10px">Products</h3>
+<div class="grid" id="productList"></div>
+<button onclick="goHome()">⬅ Back</button>
+</div>
+
+<div id="checkout" style="display:none">
+<h3 style="padding:10px">Checkout</h3>
+<div id="cartItems"></div>
+
+<input id="state" placeholder="Enter State (Delhi/Other)" style="width:90%;margin:10px;padding:10px">
+
+<button onclick="payNow()">Pay Now</button>
+</div>
+
+<div class="cart" onclick="openCheckout()">🛒</div>
 
 <script>
-let products=[
- {name:'SMPS Repair Kit',price:299,rating:4},
- {name:'Induction Repair Kit',price:399,rating:5},
- {name:'Multimeter',price:199,rating:4}
-];
 
-let cart=[];
+// products data
+let data = {
+transistor:[{name:"2N3055",price:50},{name:"C1815",price:10}],
+mosfet:[{name:"IRFZ44N",price:60}],
+capacitor:[{name:"450V Cap",price:30}],
+pcb:[{name:"Induction PCB",price:300}]
+};
 
-function displayProducts(list){
- let html='';
- list.forEach(p=>{
+let cart = [];
+
+// open category
+function openCat(cat){
+ document.getElementById("home").style.display="none";
+ document.getElementById("products").style.display="block";
+
+ let html="";
+ data[cat].forEach(p=>{
   html+=`
   <div class="product">
-   <h3>${p.name}</h3>
-   <p class="price">₹${p.price}</p>
-   <p class="rating">${'⭐'.repeat(p.rating)}</p>
-   <button class="add" onclick="addToCart('${p.name}',${p.price})">Add to Cart</button>
-   <button class="buy" onclick="buyNow('${p.name}',${p.price})">Buy Now</button>
+   <h4>${p.name}</h4>
+   <p>₹${p.price}</p>
+   <button onclick="addCart('${p.name}',${p.price})">Add</button>
   </div>`;
  });
- document.getElementById('productList').innerHTML=html;
+
+ document.getElementById("productList").innerHTML=html;
 }
 
-function addToCart(name,price){
+// add to cart
+function addCart(name,price){
  cart.push({name,price});
- alert('Added to cart');
+ alert("Added");
 }
 
-function viewCart(){
- let total=0;
- let msg='Cart:\n';
+// back home
+function goHome(){
+ document.getElementById("products").style.display="none";
+ document.getElementById("home").style.display="block";
+}
+
+// open checkout
+function openCheckout(){
+ document.getElementById("products").style.display="none";
+ document.getElementById("home").style.display="none";
+ document.getElementById("checkout").style.display="block";
+
+ let total=0,html="";
  cart.forEach(c=>{
-  msg+=c.name+' ₹'+c.price+'\n';
+  html+=`<p>${c.name} - ₹${c.price}</p>`;
   total+=c.price;
  });
- msg+='Total: ₹'+total;
- alert(msg);
+
+ html+=`<hr>Total: ₹${total}`;
+ document.getElementById("cartItems").innerHTML=html;
 }
 
-function buyNow(name,price){
+// payment
+function payNow(){
+
+ let state=document.getElementById("state").value;
+
+ if(!state){
+  alert("Enter state");
+  return;
+ }
+
+ let total=0;
+ cart.forEach(c=> total+=c.price);
+
+ let delivery = (state.toLowerCase()=="delhi") ? 100 : 150;
+
+ let final = total + delivery;
+
+ if(final < 500){
+  alert("Minimum order ₹500 required");
+  return;
+ }
+
+ let confirmPay = confirm(
+  "Total: ₹"+total+
+  "\\nDelivery: ₹"+delivery+
+  "\\nFinal: ₹"+final
+ );
+
+ if(!confirmPay) return;
+
  let upi="9953311542@ybl";
- let url=`upi://pay?pa=${upi}&pn=ElectroElectric&am=${price}&cu=INR`;
+
+ let url=`upi://pay?pa=${upi}&pn=ElectroElectric&am=${final}&cu=INR`;
+
  window.location.href=url;
 }
 
-function searchProduct(text){
- let filtered=products.filter(p=>p.name.toLowerCase().includes(text.toLowerCase()));
- displayProducts(filtered);
-}
-
-// load
-
-displayProducts(products);
 </script>
 
 </body>
