@@ -30,20 +30,6 @@ position:fixed;bottom:20px;right:20px;
 background:#000;color:#fff;padding:12px;border-radius:50%
 }
 
-/* 🔥 NEW BACK BUTTON */
-.backBtn{
-position:fixed;
-top:10px;
-left:10px;
-background:#ff5722;
-color:#fff;
-padding:12px 18px;
-border-radius:8px;
-font-size:16px;
-z-index:999;
-box-shadow:0 3px 8px rgba(0,0,0,0.3)
-}
-
 </style>
 </head>
 
@@ -61,15 +47,15 @@ box-shadow:0 3px 8px rgba(0,0,0,0.3)
 
 <!-- PRODUCTS -->
 <div id="products" style="display:none">
-<button class="backBtn" onclick="goHome()">⬅ Back</button>
 <div class="grid" id="productList"></div>
+<button onclick="goHome()">⬅ Back</button>
 </div>
 
 <div class="cart" onclick="alert('Cart system same rahega')">🛒</div>
 
 <script>
 
-// 🔥 DATA (same as working code)
+// 🔥 DATA (FULL)
 let data={
 
 diode:[
@@ -120,12 +106,37 @@ mosfet:[
 
 };
 
-// CATEGORY LOAD
+// 🔥 RESISTORS AUTO GENERATE
+let base=[
+["56K","56k.jpeg"],["4K7","4k7.jpeg"],["3K3","3k3.jpeg"],["33K","33K.jpeg"],["330K","330K.jpeg"],
+["2K2","2k2.jpeg"],["2K7","2K7.jpeg"],["27Ω","27OHMS.jpeg"],["22K","22K.jpeg"],
+["220K","220k.jpeg"],["220Ω","220 ohms.jpeg"],["2.2Ω","2.2 ohms.jpeg"],
+["1K","1k.jpeg"],["1Ω","1OHMS.jpeg"],["10K","10k.jpeg"],["150Ω","150 ohms.jpeg"],["100Ω","100 ohms.jpeg"]
+];
+
+data["resistors"]=[];
+
+base.forEach(r=>{
+let img="https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/"+r[1];
+
+// 1/4W
+data.resistors.push({name:r[0]+" 1/4W",price:45,offer:35,unit:"50 pcs",img});
+
+// 1/2W
+data.resistors.push({name:r[0]+" 1/2W",price:90,offer:70,unit:"50 pcs",img});
+
+// 1W
+data.resistors.push({name:r[0]+" 1W",price:180,offer:140,unit:"50 pcs",img});
+});
+
+
+// CATEGORY SHOW (NO IMAGE)
 let catHTML="";
 Object.keys(data).forEach(c=>{
 catHTML+=`<div class="card" onclick="openCat('${c}')"><h3>${c.toUpperCase()}</h3></div>`;
 });
 document.getElementById("catList").innerHTML=catHTML;
+
 
 // OPEN CATEGORY
 function openCat(cat){
