@@ -5,31 +5,42 @@
 <title>Electro Electric</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f5f5f5}
-
+body{margin:0;font-family:Arial;background:#f5f5f5;padding-bottom:80px;}
 header{background:#131921;color:#fff;text-align:center;padding:15px}
 header h1{margin:0;font-size:32px}
 
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px}
-
 .card,.product{
 background:#fff;padding:10px;border-radius:10px;text-align:center;
-box-shadow:0 2px 6px rgba(0,0,0,0.1)
+box-shadow:0 2px 6px rgba(0,0,0,0.1);position:relative;
 }
 
-.product img{
-width:100%;height:120px;object-fit:contain;margin-bottom:5px
-}
+.product img{width:100%;height:120px;object-fit:contain;margin-bottom:5px}
+button{background:#28a745;color:#fff;border:none;padding:8px 15px;border-radius:5px;cursor:pointer}
+button.back-btn{background:#555;margin:10px}
 
-button{
-background:#28a745;color:#fff;border:none;padding:8px;border-radius:5px
-}
-
-.cart{
+/* Cart Floating Button */
+.cart-float{
 position:fixed;bottom:20px;right:20px;
-background:#000;color:#fff;padding:12px;border-radius:50%
+background:#007bff;color:#fff;padding:15px;border-radius:50%;
+box-shadow:0 4px 10px rgba(0,0,0,0.3);z-index:1000;cursor:pointer;
 }
+.cart-count{position:absolute;top:0;right:0;background:red;font-size:12px;padding:2px 6px;border-radius:50%}
 
+/* Modal/Forms */
+.screen{display:none;padding:15px;background:#fff;min-height:100vh}
+.active{display:block}
+
+/* Address Form Styling (Matching your Images) */
+.form-group{margin-bottom:15px;text-align:left}
+.form-group label{display:block;margin-bottom:5px;font-weight:bold;color:#333}
+.form-group input, .form-group textarea{
+width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;font-size:14px
+}
+.pay-btn{background:#5e44ff;width:100%;padding:15px;font-size:18px;font-weight:bold;margin-top:20px}
+
+/* Cart List */
+.cart-item{display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:10px 0}
 </style>
 </head>
 
@@ -37,138 +48,160 @@ background:#000;color:#fff;padding:12px;border-radius:50%
 
 <header>
 <h1>Electro Electric</h1>
-<p>Welcome to the electronics website</p>
+<p>Electronics Components Store</p>
 </header>
 
-<!-- HOME -->
-<div id="home">
-<div class="grid" id="catList"></div>
+<div id="home" class="screen active">
+    <div class="grid" id="catList"></div>
 </div>
 
-<!-- PRODUCTS -->
-<div id="products" style="display:none">
-<div class="grid" id="productList"></div>
-<button onclick="goHome()">⬅ Back</button>
+<div id="products" class="screen">
+    <button class="back-btn" onclick="showScreen('home')">⬅ Back to Categories</button>
+    <div class="grid" id="productList"></div>
 </div>
 
-<div class="cart" onclick="alert('Cart system same rahega')">🛒</div>
+<div id="cartScreen" class="screen">
+    <h2>Your Cart</h2>
+    <div id="cartItemsList"></div>
+    <hr>
+    <h3 id="totalAmount">Total: ₹0</h3>
+    <button style="width:100%;background:#007bff" onclick="showScreen('addressScreen')">Proceed to Address</button>
+    <button class="back-btn" onclick="showScreen('products')">Continue Shopping</button>
+</div>
+
+<div id="addressScreen" class="screen">
+    <h3>Shop Registration / Delivery Address</h3>
+    <div class="form-group">
+        <label>Mobile Number</label>
+        <input type="number" placeholder="10-digit mobile number">
+    </div>
+    <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" placeholder="Enter contact name">
+    </div>
+    <div class="form-group">
+        <label>Shop Name</label>
+        <input type="text" placeholder="Official Business Name">
+    </div>
+    <div class="form-group">
+        <label>Complete Address</label>
+        <textarea rows="3" placeholder="Building No, Street, Area..."></textarea>
+    </div>
+    <div class="form-group">
+        <label>Landmark</label>
+        <input type="text" placeholder="Nearby famous place">
+    </div>
+    <div class="form-group">
+        <label>Pincode</label>
+        <input type="number" placeholder="6-digit pincode">
+    </div>
+    <div class="form-group">
+        <label>City/Village</label>
+        <input type="text" placeholder="City or Village name">
+    </div>
+    <div class="form-group">
+        <label>State</label>
+        <input type="text" placeholder="Enter State">
+    </div>
+    
+    <button class="pay-btn" onclick="alert('Order Placed Successfully!')">Save & Pay Now</button>
+    <button class="back-btn" onclick="showScreen('cartScreen')">Back to Cart</button>
+</div>
+
+<div class="cart-float" onclick="showCart()">
+    🛒 <span class="cart-count" id="countBadge">0</span>
+</div>
 
 <script>
+let cart = [];
 
-// 🔥 DATA (FULL)
 let data={
-
-diode:[
-{name:"5v6 Zener",price:80,offer:70,unit:"50 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/zener%205v6.jpeg"},
-{name:"FR207",price:150,offer:130,unit:"30 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/FR207.jpeg"},
-{name:"4148",price:60,offer:55,unit:"30 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/4148.jpeg"},
-{name:"24V Zener",price:60,offer:55,unit:"25 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/24V%20ZENER.jpeg"},
-{name:"1N4007",price:70,offer:55,unit:"50 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/1n4007.jpeg"}
-],
-
-transistor:[
-{name:"TL431",price:80,offer:70,unit:"50 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/tl431.jpeg"},
-{name:"S8050",price:100,offer:90,unit:"50 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/S8050.jpeg"},
-{name:"C1815",price:90,offer:80,unit:"50 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/c1815.jpeg"},
-{name:"D718",price:60,offer:50,unit:"1 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/D718.jpeg"},
-{name:"C2482",price:90,offer:85,unit:"30 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/C2482.jpeg"},
-{name:"C2229",price:80,unit:"30 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/C2229.jpeg"},
-{name:"BC548",price:50,offer:45,unit:"20 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/BC548.jpeg"},
-{name:"B764",price:70,offer:65,unit:"10 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/B764.jpeg"},
-{name:"B688",price:60,offer:52,unit:"1 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/B688.jpeg"},
-{name:"C3807",price:70,offer:55,unit:"5 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/B3807.jpeg"},
-{name:"A940",price:60,offer:58,unit:"5 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/A940.jpeg"},
-{name:"A1015",price:25,unit:"10 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/A1015.jpeg"},
-{name:"S8550",price:100,offer:90,unit:"50 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/8550.jpeg"},
-{name:"2N5401",price:60,offer:55,unit:"30 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/2n5401.jpeg"},
-{name:"2SA1943",price:150,offer:130,unit:"1 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/2SA1943.jpeg"},
-{name:"2N5551",price:60,offer:55,unit:"30 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/2N5551.jpeg"}
-],
-
-pcb:[
-{name:"Induction Board",price:300,offer:280,unit:"1 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/induction270.jpeg"},
-{name:"Induction Best",price:340,offer:300,unit:"1 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/induction%20300.jpeg"}
-],
-
-modules:[
-{name:"CA-888",price:80,offer:75,unit:"1 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/CA%20888.jpeg"}
-],
-
-fuse:[
-{name:"7.5A Fuse",price:30,unit:"5 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/7.5A%20FUSE.jpeg"}
-],
-
-mosfet:[
-{name:"19N60",price:45,offer:40,unit:"1 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/19N60.jpeg"},
-{name:"15N60",price:45,offer:40,unit:"1 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/15N60.jpeg"},
-{name:"10N65",price:45,offer:38,unit:"1 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/10N65.jpeg"}
-]
-
+    diode:[
+        {name:"5v6 Zener",price:80,offer:70,unit:"50 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/zener%205v6.jpeg"},
+        {name:"FR207",price:150,offer:130,unit:"30 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/FR207.jpeg"},
+        {name:"4148",price:60,offer:55,unit:"30 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/4148.jpeg"},
+        {name:"24V Zener",price:60,offer:55,unit:"25 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/24V%20ZENER.jpeg"},
+        {name:"1N4007",price:70,offer:55,unit:"50 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/1n4007.jpeg"}
+    ],
+    transistor:[
+        {name:"TL431",price:80,offer:70,unit:"50 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/tl431.jpeg"},
+        {name:"S8050",price:100,offer:90,unit:"50 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/S8050.jpeg"},
+        {name:"2N5551",price:60,offer:55,unit:"30 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/2N5551.jpeg"}
+    ],
+    pcb:[
+        {name:"Induction Board",price:300,offer:280,unit:"1 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/induction270.jpeg"},
+        {name:"Induction Best",price:340,offer:300,unit:"1 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/induction%20300.jpeg"}
+    ],
+    modules:[
+        {name:"CA-888",price:80,offer:75,unit:"1 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/CA%20888.jpeg"}
+    ],
+    mosfet:[
+        {name:"19N60",price:45,offer:40,unit:"1 pcs",img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/19N60.jpeg"}
+    ]
 };
 
-// 🔥 RESISTORS AUTO GENERATE
-let base=[
-["56K","56k.jpeg"],["4K7","4k7.jpeg"],["3K3","3k3.jpeg"],["33K","33K.jpeg"],["330K","330K.jpeg"],
-["2K2","2k2.jpeg"],["2K7","2K7.jpeg"],["27Ω","27OHMS.jpeg"],["22K","22K.jpeg"],
-["220K","220k.jpeg"],["220Ω","220 ohms.jpeg"],["2.2Ω","2.2 ohms.jpeg"],
-["1K","1k.jpeg"],["1Ω","1OHMS.jpeg"],["10K","10k.jpeg"],["150Ω","150 ohms.jpeg"],["100Ω","100 ohms.jpeg"]
-];
-
+// AUTO GENERATE RESISTORS
+let base=[["56K","56k.jpeg"],["4K7","4k7.jpeg"],["1K","1k.jpeg"]];
 data["resistors"]=[];
-
 base.forEach(r=>{
-let img="https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/"+r[1];
-
-// 1/4W
-data.resistors.push({name:r[0]+" 1/4W",price:45,offer:35,unit:"50 pcs",img});
-
-// 1/2W
-data.resistors.push({name:r[0]+" 1/2W",price:90,offer:70,unit:"50 pcs",img});
-
-// 1W
-data.resistors.push({name:r[0]+" 1W",price:180,offer:140,unit:"50 pcs",img});
+    let img="https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/"+r[1];
+    data.resistors.push({name:r[0]+" 1/4W",price:45,offer:35,unit:"50 pcs",img});
 });
 
+// Utility to switch screens
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+    window.scrollTo(0,0);
+}
 
-// CATEGORY SHOW (NO IMAGE)
+// Render Categories
 let catHTML="";
 Object.keys(data).forEach(c=>{
-catHTML+=`<div class="card" onclick="openCat('${c}')"><h3>${c.toUpperCase()}</h3></div>`;
+    catHTML+=`<div class="card" onclick="openCat('${c}')"><h3>${c.toUpperCase()}</h3></div>`;
 });
 document.getElementById("catList").innerHTML=catHTML;
 
-
-// OPEN CATEGORY
+// Open Category
 function openCat(cat){
-document.getElementById("home").style.display="none";
-document.getElementById("products").style.display="block";
-
-let html="";
-data[cat].forEach(p=>{
-html+=`
-<div class="product">
-<img src="${p.img}">
-<h4>${p.name}</h4>
-
-<p>
-₹${p.offer || p.price}
-${p.offer ? `<span style="text-decoration:line-through;color:red;font-size:12px">₹${p.price}</span>` : ""}
-<br><small>${p.unit}</small>
-</p>
-
-<button>Add</button>
-</div>`;
-});
-
-document.getElementById("productList").innerHTML=html;
+    showScreen('products');
+    let html="";
+    data[cat].forEach((p, index)=>{
+        html+=`
+        <div class="product">
+            <img src="${p.img}">
+            <h4>${p.name}</h4>
+            <p>₹${p.offer || p.price} <br><small>${p.unit}</small></p>
+            <button onclick="addToCart('${cat}', ${index})">Add to Cart</button>
+        </div>`;
+    });
+    document.getElementById("productList").innerHTML=html;
 }
 
-function goHome(){
-document.getElementById("products").style.display="none";
-document.getElementById("home").style.display="block";
+// Cart Functions
+function addToCart(cat, index) {
+    let item = data[cat][index];
+    cart.push(item);
+    document.getElementById("countBadge").innerText = cart.length;
+    alert(item.name + " added to cart!");
+}
+
+function showCart() {
+    showScreen('cartScreen');
+    let html = "";
+    let total = 0;
+    cart.forEach((item, i) => {
+        let price = item.offer || item.price;
+        total += price;
+        html += `<div class="cart-item">
+                    <span>${item.name}</span>
+                    <span>₹${price}</span>
+                 </div>`;
+    });
+    document.getElementById("cartItemsList").innerHTML = html || "Cart is Empty";
+    document.getElementById("totalAmount").innerText = "Total: ₹" + total;
 }
 
 </script>
-
 </body>
 </html>
