@@ -6,23 +6,11 @@
 
 <style>
 body{margin:0;font-family:Arial;background:#f5f5f5}
-
-header{
-background:#131921;
-color:#fff;
-padding:15px;
-text-align:center;
-}
-
+header{background:#131921;color:#fff;padding:15px;text-align:center}
 header h1{margin:0;font-size:34px}
 header p{margin:5px 0 0;color:#ccc}
 
-/* 🔥 HOME BANNER ONLY */
-.banner img{
-width:100%;
-height:150px;
-object-fit:cover;
-}
+.banner img{width:100%;height:150px;object-fit:cover}
 
 .search{padding:10px;background:#fff}
 .search input{width:100%;padding:10px;border:1px solid #ccc;border-radius:5px}
@@ -44,20 +32,18 @@ padding:8px;border:none;border-radius:5px;background:#28a745;color:#fff;margin-t
 position:fixed;bottom:20px;right:20px;background:#000;color:#fff;
 padding:12px;border-radius:50%
 }
-
 .count{
 position:absolute;top:-5px;right:-5px;background:red;color:#fff;
 padding:3px 6px;border-radius:50%;font-size:12px
 }
 
+.warning{color:red;font-size:13px}
+
 .popup{
 position:fixed;top:0;left:0;width:100%;height:100%;
 background:#0008;display:none;justify-content:center;align-items:center
 }
-
-.popup div{
-background:#fff;padding:20px;border-radius:10px;text-align:center
-}
+.popup div{background:#fff;padding:20px;border-radius:10px;text-align:center}
 </style>
 
 </head>
@@ -69,15 +55,18 @@ background:#fff;padding:20px;border-radius:10px;text-align:center
 <p>Welcome to the electronics website</p>
 </header>
 
-<!-- 🔥 ONLY HOME BANNER -->
-<div id="homeBanner" class="banner">
+<div class="banner">
 <img src="https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/electro%20electric%20head.jpeg">
 </div>
 
-<!-- LOGIN REMOVED (DIRECT ENTRY) -->
+<!-- LOGIN -->
+<div id="login" style="padding:10px">
+<input id="user" placeholder="Enter Mobile or Email">
+<button onclick="login()">Continue</button>
+</div>
 
 <!-- HOME -->
-<div id="home">
+<div id="home" style="display:none">
 <div class="search">
 <input id="search" placeholder="Search..." onkeyup="searchProduct()">
 </div>
@@ -99,22 +88,20 @@ background:#fff;padding:20px;border-radius:10px;text-align:center
 
 <p>Total: ₹<b id="total"></b></p>
 
-<p style="color:red;font-size:13px">
-⚠️ Exact payment required. Partial payment may not process order correctly.
+<p class="warning">
+⚠️ Exact amount hi pay kare. Galat payment par order process nahi hoga aur refund nahi milega.
 </p>
 
 <button onclick="payNow()">Pay Now</button>
 </div>
 
-<div class="cart" onclick="openCheckout()">
-🛒 <span class="count" id="count">0</span>
-</div>
+<div class="cart" onclick="openCheckout()">🛒 <span class="count" id="count">0</span></div>
 
 <div class="popup" id="popup">
 <div>
-<h3>Order Confirmed</h3>
+<h3>✅ Order Confirmed</h3>
 <a href="https://www.instagram.com/imran_shaikh99533" target="_blank">
-<button>Instagram</button>
+<button>Open Instagram</button>
 </a>
 <br><br>
 <button onclick="downloadPDF()">Download Invoice</button>
@@ -130,59 +117,85 @@ transistor:[
 {name:"C1815",price:80,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/c1815.jpeg"},
 {name:"S8050",price:90,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/S8050.jpeg"}
 ],
+
 mosfet:[
-{name:"19N60",price:40,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/19N60.jpeg"},
-{name:"15N60",price:40,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/15N60.jpeg"}
+{name:"19N60 MOSFET",price:40,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/19N60.jpeg"},
+{name:"15N60 MOSFET",price:40,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/15N60.jpeg"}
 ],
+
 diode:[
 {name:"FR207",price:130,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/FR207.jpeg"},
 {name:"1N4007",price:55,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/1n4007.jpeg"}
 ],
+
 capacitor:[
 {name:"450V Capacitor",price:30,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/induction270.jpeg"}
 ],
+
 pcb:[
 {name:"Induction PCB",price:280,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/induction270.jpeg"}
 ],
+
 modules:[
-{name:"CA-888",price:75,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/CA%20888.jpeg"}
+{name:"CA-888 Module",price:75,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/CA%20888.jpeg"}
 ],
+
 fuse:[
 {name:"7.5A Fuse",price:30,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/7.5A%20FUSE.jpeg"}
 ]
 };
 
-/* RESISTORS AUTO */
-let base=[
+// RESISTORS AUTO
+let baseResistors=[
 {name:"10K",price:45,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/10k.jpeg"},
 {name:"1K",price:45,img:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/1k.jpeg"}
 ];
 
 let resistors=[];
-base.forEach(r=>{
-resistors.push({...r,name:r.name+" 1/4W"});
-resistors.push({name:r.name+" 1/2W",price:r.price*2,img:r.img});
-resistors.push({name:r.name+" 1W",price:r.price*4,img:r.img});
+baseResistors.forEach(r=>{
+resistors.push({...r,name:r.name+" (1/4W)"});
+resistors.push({name:r.name+" (1/2W)",price:r.price*2,img:r.img});
+resistors.push({name:r.name+" (1W)",price:r.price*4,img:r.img});
 });
 data["resistors"]=resistors;
 
-/* CATEGORY */
+// CATEGORY IMAGES
+let catImages={
+transistor:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/c1815.jpeg",
+mosfet:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/19N60.jpeg",
+diode:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/4148.jpeg",
+resistors:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/10k.jpeg",
+capacitor:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/induction270.jpeg",
+pcb:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/induction270.jpeg",
+modules:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/CA%20888.jpeg",
+fuse:"https://cdn.jsdelivr.net/gh/ElectroElectric/Electronics@main/7.5A%20FUSE.jpeg"
+};
+
 let cart=[];
 
+/* LOGIN */
+function login(){
+if(!document.getElementById("user").value){alert("Enter details");return;}
+document.getElementById("login").style.display="none";
+document.getElementById("home").style.display="block";
+loadCat();
+}
+
+/* CATEGORY */
 function loadCat(){
 let html="";
 Object.keys(data).forEach(c=>{
-html+=`<div class="card" onclick="openCat('${c}')"><h3>${c.toUpperCase()}</h3></div>`;
+html+=`
+<div class="card" onclick="openCat('${c}')">
+<img src="${catImages[c]}" style="height:80px">
+<h4>${c.toUpperCase()}</h4>
+</div>`;
 });
 document.getElementById("catList").innerHTML=html;
 }
 
-/* OPEN CATEGORY */
+/* PRODUCTS */
 function openCat(cat){
-
-// 🔥 hide banner in products
-document.getElementById("homeBanner").style.display="none";
-
 document.getElementById("home").style.display="none";
 document.getElementById("products").style.display="block";
 
@@ -193,22 +206,75 @@ html+=`
 <img src="${p.img}">
 <h4>${p.name}</h4>
 <p>₹${p.price}</p>
-<button>Add</button>
+<button onclick="addCart('${p.name}',${p.price})">Add</button>
 </div>`;
 });
-
 document.getElementById("productList").innerHTML=html;
 }
 
-/* BACK HOME */
-function goHome(){
-document.getElementById("products").style.display="none";
-document.getElementById("home").style.display="block";
-document.getElementById("homeBanner").style.display="block";
+/* CART */
+function addCart(name,price){
+let item=cart.find(i=>i.name==name);
+if(item){item.qty++}else{cart.push({name,price,qty:1})}
+updateCart();
 }
 
-/* INIT */
-loadCat();
+function updateCart(){
+let c=0;
+cart.forEach(i=>c+=i.qty);
+document.getElementById("count").innerText=c;
+}
+
+/* SEARCH */
+function searchProduct(){
+let val=document.getElementById("search").value.toLowerCase();
+let html="";
+Object.values(data).flat().forEach(p=>{
+if(p.name.toLowerCase().includes(val)){
+html+=`
+<div class="product">
+<img src="${p.img}">
+<h4>${p.name}</h4>
+<p>₹${p.price}</p>
+<button onclick="addCart('${p.name}',${p.price})">Add</button>
+</div>`;
+}
+});
+document.getElementById("productList").innerHTML=html;
+}
+
+/* CHECKOUT */
+function openCheckout(){
+document.getElementById("products").style.display="none";
+document.getElementById("home").style.display="none";
+document.getElementById("checkout").style.display="block";
+
+let total=0,html="";
+cart.forEach(c=>{
+let sub=c.price*c.qty;
+total+=sub;
+html+=`<p>${c.name} x ${c.qty} = ₹${sub}</p>`;
+});
+
+document.getElementById("total").innerText=total;
+document.getElementById("cartItems").innerHTML=html;
+}
+
+/* PAYMENT */
+function payNow(){
+window.open(paymentLink,"_blank");
+document.getElementById("popup").style.display="flex";
+}
+
+/* PDF */
+function downloadPDF(){
+let text="Electro Electric Invoice\nThank You";
+let blob=new Blob([text],{type:"text/plain"});
+let link=document.createElement("a");
+link.href=URL.createObjectURL(blob);
+link.download="invoice.txt";
+link.click();
+}
 
 </script>
 
