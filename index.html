@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -29,6 +28,7 @@
         .modal{display:none; position:fixed; z-index:2000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content:center; align-items:center;}
         .modal-content{background:#fff; padding:25px; border-radius:20px; width:85%; text-align:center;}
         #invoice-template { display:none; padding:30px; }
+        .home-banner{width:100%; border-radius:12px; margin-bottom:15px; box-shadow:0 4px 10px rgba(0,0,0,0.1);}
     </style>
 </head>
 <body>
@@ -69,7 +69,11 @@
         </div>
     </header>
 
-    <div id="home" class="screen active"><div class="grid" id="catList"></div></div>
+    <div id="home" class="screen active">
+        <!-- Home Screen Image Added Back -->
+        <img src="https://raw.githubusercontent.com/ElectroElectric/Electronics/refs/heads/main/electro%20electric%20head.jpeg" class="home-banner">
+        <div class="grid" id="catList"></div>
+    </div>
     
     <div id="products" class="screen">
         <button class="secondary-btn" style="width:auto; margin-bottom:15px;" onclick="showScreen('home')">⬅ Back</button>
@@ -117,6 +121,13 @@ const sellerNumber = "9953311542";
 let currentUser = null;
 let cart = {};
 let allOrders = JSON.parse(localStorage.getItem('electro_master_records')) || [];
+
+// Navigation Control - Phone Back Button Fixed
+window.addEventListener('popstate', function (event) {
+    if (currentUser) {
+        showScreen('home', false); // Back button se hamesha Home par aayega
+    }
+});
 
 let data = {
     diode: [
@@ -177,12 +188,14 @@ function handleAuth() {
     currentUser = { phone: p, state: s };
     document.getElementById("authScreen").style.display="none";
     document.getElementById("mainApp").style.display="block";
+    history.pushState({page: 'home'}, 'home'); // History entry added
     renderCategories();
 }
 
-function showScreen(id) {
+function showScreen(id, pushHistory = true) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    if (pushHistory) history.pushState({page: id}, id); // History control
     if(id === 'accountScreen') renderRecords();
     if(id === 'addressScreen') updateFinalBill();
 }
